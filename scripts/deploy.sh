@@ -6,11 +6,11 @@ echo 'Copy files...'
 
 scp -i ~/.ssh/fake-news/vscale \
   target/fakenews-0.0.1-SNAPSHOT.jar \
-  root@77.223.97.110:/home/eleventh/fakenews
+  root@77.223.96.230:/home/eleventh/fakenews
 
 echo 'Restart server...'
 
-ssh -i ~/.ssh/fake-news/vscale root@77.223.97.110 << EOF
+ssh -i ~/.ssh/fake-news/vscale root@77.223.96.230 << EOF
 
 pgrep java | xargs kill -9
 nohup java -jar fakenews-0.0.1-SNAPSHOT.jar > log.txt &
