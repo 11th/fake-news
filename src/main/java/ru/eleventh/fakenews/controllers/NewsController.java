@@ -40,7 +40,6 @@ public class NewsController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
-        //model.addAttribute("news", newsDAO.findById(id));
         model.addAttribute("news", newsService.findById(id));
         return "/show";
     }
@@ -54,7 +53,6 @@ public class NewsController {
     public String create(@ModelAttribute("news") @Valid News news, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return "/new";
-        //newsDAO.save(news);
         newsService.save(news);
         return "redirect:/news";
     }
@@ -75,7 +73,6 @@ public class NewsController {
                 news.setTitle(zipFile.getFirstRow());
                 news.setText(zipFile.getSecondRow());
                 news.setRubric(rubric);
-                //newsDAO.save(news);
                 newsService.save(news);
             }
         } catch (IOException | RuntimeException exception) {
@@ -87,7 +84,6 @@ public class NewsController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        //model.addAttribute("news", newsDAO.findById(id));
         model.addAttribute("news", newsService.findById(id));
         return "/edit";
     }
@@ -97,14 +93,12 @@ public class NewsController {
                          @PathVariable("id") int id) {
         if (bindingResult.hasErrors())
             return "/edit";
-        //newsDAO.update(id, news);
         newsService.update(id, news);
         return "redirect:/news";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        //newsDAO.delete(id);
         newsService.delete(id);
         return "redirect:/news";
     }
