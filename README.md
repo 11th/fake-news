@@ -1,0 +1,3 @@
+# FakeNews
+
+For install app
