@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.eleventh.fakenews.io.ZipFile;
 import ru.eleventh.fakenews.models.News;
+import ru.eleventh.fakenews.models.Rubric;
 import ru.eleventh.fakenews.service.NewsService;
 
 import javax.validation.Valid;
@@ -35,31 +36,31 @@ public class NewsController {
         } else {
             model.addAttribute("newsList", newsService.findAll(pageable));
         }
-        return "/main";
+        return "main";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
         model.addAttribute("news", newsService.findById(id));
-        return "/show";
+        return "show";
     }
 
     @GetMapping("new")
     public String addNews(@ModelAttribute("news") News news) {
-        return "/new";
+        return "new";
     }
 
     @PostMapping
     public String create(@ModelAttribute("news") @Valid News news, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
-            return "/new";
+            return "new";
         newsService.save(news);
-        return "redirect:/news";
+        return "redirect:news";
     }
 
     @GetMapping("upload")
     public String uploadNews(@ModelAttribute("news") News news) {
-        return "/upload";
+        return "upload";
     }
 
     @PostMapping("/upload")
@@ -77,7 +78,7 @@ public class NewsController {
             }
         } catch (IOException | RuntimeException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
-            return "/upload";
+            return "upload";
         }
         return "redirect:/news";
     }
@@ -85,14 +86,14 @@ public class NewsController {
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
         model.addAttribute("news", newsService.findById(id));
-        return "/edit";
+        return "edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("news") @Valid News news, BindingResult bindingResult,
                          @PathVariable("id") int id) {
         if (bindingResult.hasErrors())
-            return "/edit";
+            return "edit";
         newsService.update(id, news);
         return "redirect:/news";
     }
@@ -101,5 +102,47 @@ public class NewsController {
     public String delete(@PathVariable("id") int id) {
         newsService.delete(id);
         return "redirect:/news";
+    }
+
+    @GetMapping("addTestArticles")
+    public String addTestArticles(){
+        addTestArticles(Rubric.DEFAULT);
+        addTestArticles(Rubric.TRAVELING);
+        addTestArticles(Rubric.POLITICS);
+        addTestArticles(Rubric.FINANCE);
+        addTestArticles(Rubric.SPORT);
+        return "redirect:/news";
+    }
+
+    private void addTestArticles(Rubric rubric){
+        News news = new News();
+        news.setRubric(rubric.getDisplayValue());
+        switch (rubric) {
+            case FINANCE: {
+                news.setTitle("What is Bitcoin???");
+                news.setText("This is an article about bitcoin...");
+                break;
+            }
+            case POLITICS: {
+                news.setTitle("Democracy for everybody!!!");
+                news.setText("This is an article about democracy...");
+                break;
+            }
+            case SPORT: {
+                news.setTitle("Sport is life");
+                news.setText("This is an article about sport...");
+                break;
+            }
+            case TRAVELING: {
+                news.setTitle("From Russia with love!!!");
+                news.setText("This is an article about Russia...");
+                break;
+            }
+            default: {
+                news.setTitle("I don't know");
+                news.setText("Nothing to say...");
+            }
+        }
+        newsService.save(news);
     }
 }
