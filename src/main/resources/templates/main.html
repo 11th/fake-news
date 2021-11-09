@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fake News</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+<div th:insert="blocks/header::header"></div>
+
+<div class="mx-5 my-3">
+    <nav class="navbar navbar-light bg-secondary">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center justify-content-start">
+                <a class="btn btn-lg btn-primary" href="/news/upload" role="button">Add news</a>
+                <a class="text-white text-decoration-none fs-4 mx-3" href="/news/upload" role="button">If you have news,
+                    add it!</a>
+            </div>
+            <form class="d-flex" th:method="GET" th:action="@{/news}">
+                <select class="form-select me-2" name="rubric" id="rubric" placeholder="Filter" aria-label="Filter">
+                    <option th:each="rubricOpt : ${T(ru.eleventh.fakenews.models.Rubric).values()}"
+                            th:value="${rubricOpt.displayValue}" th:text="${rubricOpt.displayValue}"></option>
+                </select>
+                <button class="btn btn-secondary" type="submit">Filter</button>
+            </form>
+        </div>
+    </nav>
+</div>
+
+<div th:each="news : ${newsList}" class="mb-2">
+    <div class="card mx-5 my-3 rounded bg-light">
+        <div class="card-body">
+            <h5 class="card-title" th:text="${news.getTitle()}">Title</h5>
+            <p class="card-text"><small class="text-muted" th:text="${news.getRubric()}">Rubric</small></p>
+            <p class="card-text" th:text="${news.getText()}">Text</p>
+            <a class="link-secondary" th:href="'/news/' + ${news.getId()}">more...</a>
+        </div>
+    </div>
+</div>
+
+<nav aria-label="...">
+    <ul class="pagination pagination-sm mx-5 my-4">
+        <li th:if="${not newsList.isEmpty()}"
+            th:each="pageNo : ${#numbers.sequence(0, newsList.getTotalPages() - 1)}"
+            th:class="${newsList.getNumber() eq pageNo}? 'page-item active' : 'page-item'">
+            <span class="page-link" th:if="${newsList.getNumber() eq pageNo}" th:text="${pageNo + 1}"></span>
+            <a class="page-link" th:if="${not (newsList.getNumber() eq pageNo)}"
+               th:href="@{${'/news'}(page=${pageNo},size=${newsList.getSize()})}" th:text="${pageNo + 1}">num</a>
+        </li>
+    </ul>
+</nav>
+
+<div th:insert="blocks/footer::footer"></div>
+</body>
+</html>
