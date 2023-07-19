@@ -1,15 +1,15 @@
 package ru.eleventh.fakenews.io;
 
+import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@Getter
 public class ZipFile {
     private final MultipartFile file;
     private String fileName;
@@ -30,7 +30,7 @@ public class ZipFile {
         this.file = file;
     }
 
-    public boolean isValid() {
+    public void checkFileValid() {
         if (fileName.isEmpty()) {
             throw new RuntimeException("ZIP file is not exist");
         }
@@ -43,64 +43,37 @@ public class ZipFile {
         if (rowsCount != 2) {
             throw new RuntimeException("TXT file should contain two rows");
         }
-        return true;
     }
 
     private void readFile() throws IOException {
         fileName = file.getOriginalFilename();
-        fileExtension = FilenameUtils.getExtension(this.fileName);
-
-        try (ZipInputStream stream = new ZipInputStream(file.getInputStream())) {
+        fileExtension = FilenameUtils.getExtension(fileName);
+        try (ZipInputStream zis = new ZipInputStream(file.getInputStream());
+             BufferedReader br = new BufferedReader(new InputStreamReader(zis, StandardCharsets.UTF_8))) {
             ZipEntry entry;
-            while ((entry = stream.getNextEntry()) != null) {
+            while ((entry = zis.getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
                     filesInsideCount++;
                     if (FilenameUtils.getExtension(entry.getName()).equalsIgnoreCase("txt")) {
                         filesTxtCount++;
                     }
-                    List<String> lines = IOUtils.readLines(stream, StandardCharsets.UTF_8);
-                    if (!lines.isEmpty()) {
-                        rowsCount = lines.size();
-                        if (rowsCount >= 2) {
-                            firstRow = lines.get(0);
-                            secondRow = lines.get(1);
+                    boolean readNext = true;
+                    while (readNext) {
+                        String line = br.readLine();
+                        if (line != null) {
+                            if (firstRow == null) {
+                                firstRow = line;
+                            } else {
+                                secondRow = line;
+                            }
+                            rowsCount++;
+                        } else {
+                            readNext = false;
                         }
                     }
                 }
-                stream.closeEntry();
             }
+            zis.closeEntry();
         }
-    }
-
-    public MultipartFile getFile() {
-        return file;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getFileExtension() {
-        return fileExtension;
-    }
-
-    public int getRowsCount() {
-        return rowsCount;
-    }
-
-    public int getFilesInsideCount() {
-        return filesInsideCount;
-    }
-
-    public int getFilesTxtCount() {
-        return filesTxtCount;
-    }
-
-    public String getFirstRow() {
-        return firstRow;
-    }
-
-    public String getSecondRow() {
-        return secondRow;
     }
 }
