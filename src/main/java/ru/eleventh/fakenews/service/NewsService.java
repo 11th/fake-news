@@ -1,11 +1,14 @@
 package ru.eleventh.fakenews.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import ru.eleventh.fakenews.io.ZipFile;
 import ru.eleventh.fakenews.models.News;
 import ru.eleventh.fakenews.repository.NewsRepository;
+
+import java.io.IOException;
 
 @Service
 public class NewsService {
@@ -23,7 +26,7 @@ public class NewsService {
         return newsRepository.findById(id).stream().findAny().orElse(null);
     }
 
-    public Page<News> findAllByRubric (String rubric, Pageable pageable){
+    public Page<News> findAllByRubric(String rubric, Pageable pageable) {
         return newsRepository.findAllByRubric(rubric, pageable);
     }
 
@@ -32,10 +35,21 @@ public class NewsService {
     }
 
     public void update(int id, News news) {
+        news.setId(id);
         newsRepository.save(news);
     }
 
     public void delete(long id) {
         newsRepository.deleteById(id);
+    }
+
+    public void upload(MultipartFile file, String rubric) throws IOException {
+        ZipFile zipFile = ZipFile.getInstance(file);
+        zipFile.checkFileValid();
+        News news = new News();
+        news.setTitle(zipFile.getFirstRow());
+        news.setText(zipFile.getSecondRow());
+        news.setRubric(rubric);
+        newsRepository.save(news);
     }
 }

@@ -4,12 +4,13 @@ CREATE TABLE news
 (
     id     INT PRIMARY KEY AUTO_INCREMENT,
     title  VARCHAR NOT NULL,
-    text   VARCHAR NOT NULL
+    text   VARCHAR NOT NULL,
+    rubric VARCHAR
 );
 
--- INSERT INTO news (id, title, text)
--- VALUES (1, 'News 1', 'Text 1'),
---        (2, 'News 2', 'Text 2'),
---        (3, 'News 3', 'Text 3'),
---        (4, 'News 4', 'Text 4'),
---        (5, 'News 5', 'Text 5');
+INSERT INTO news (id, title, text, rubric)
+VALUES (1, 'What is Bitcoin???', 'This is an article about bitcoin...', 'Finance'),
+       (2, 'Democracy for everybody!!!', 'This is an article about democracy...', 'Politics'),
+       (3, 'Sport is life', 'This is an article about sport...', 'Sport'),
+       (4, 'From Russia with love!!!', 'This is an article about Russia...', 'Traveling'),
+       (5, 'I do not know', 'Nothing to say...', '');

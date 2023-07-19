@@ -8,9 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.eleventh.fakenews.io.ZipFile;
 import ru.eleventh.fakenews.models.News;
-import ru.eleventh.fakenews.models.Rubric;
 import ru.eleventh.fakenews.service.NewsService;
 
 import javax.validation.Valid;
@@ -66,14 +64,7 @@ public class NewsController {
                          @RequestParam(value = "rubric", required = false) String rubric,
                          Model model) {
         try {
-            ZipFile zipFile = ZipFile.getInstance(file);
-            if (zipFile.isValid()) {
-                News news = new News();
-                news.setTitle(zipFile.getFirstRow());
-                news.setText(zipFile.getSecondRow());
-                news.setRubric(rubric);
-                newsService.save(news);
-            }
+            newsService.upload(file, rubric);
         } catch (IOException | RuntimeException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
             return "upload";
@@ -100,47 +91,5 @@ public class NewsController {
     public String delete(@PathVariable("id") int id) {
         newsService.delete(id);
         return "redirect:/news";
-    }
-
-    @GetMapping("addTestArticles")
-    public String addTestArticles(){
-        addTestArticles(Rubric.DEFAULT);
-        addTestArticles(Rubric.TRAVELING);
-        addTestArticles(Rubric.POLITICS);
-        addTestArticles(Rubric.FINANCE);
-        addTestArticles(Rubric.SPORT);
-        return "redirect:/news";
-    }
-
-    private void addTestArticles(Rubric rubric){
-        News news = new News();
-        news.setRubric(rubric.getDisplayValue());
-        switch (rubric) {
-            case FINANCE: {
-                news.setTitle("What is Bitcoin???");
-                news.setText("This is an article about bitcoin...");
-                break;
-            }
-            case POLITICS: {
-                news.setTitle("Democracy for everybody!!!");
-                news.setText("This is an article about democracy...");
-                break;
-            }
-            case SPORT: {
-                news.setTitle("Sport is life");
-                news.setText("This is an article about sport...");
-                break;
-            }
-            case TRAVELING: {
-                news.setTitle("From Russia with love!!!");
-                news.setText("This is an article about Russia...");
-                break;
-            }
-            default: {
-                news.setTitle("I don't know");
-                news.setText("Nothing to say...");
-            }
-        }
-        newsService.save(news);
     }
 }
