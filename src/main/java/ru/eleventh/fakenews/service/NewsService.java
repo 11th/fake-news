@@ -9,9 +9,8 @@ import ru.eleventh.fakenews.repository.NewsRepository;
 
 @Service
 public class NewsService {
-    private NewsRepository newsRepository;
+    private final NewsRepository newsRepository;
 
-    @Autowired
     public NewsService(NewsRepository newsRepository) {
         this.newsRepository = newsRepository;
     }

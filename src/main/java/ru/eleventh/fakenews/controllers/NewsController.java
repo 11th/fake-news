@@ -1,6 +1,5 @@
 package ru.eleventh.fakenews.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,7 +21,6 @@ import java.io.IOException;
 public class NewsController {
     private final NewsService newsService;
 
-    @Autowired
     public NewsController(NewsService newsService){
         this.newsService = newsService;
     }
